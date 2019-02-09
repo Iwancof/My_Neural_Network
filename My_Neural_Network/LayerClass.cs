@@ -22,8 +22,10 @@ namespace My_Neural_Network
             Weigth = new double[NeuronNumber, NeuronNumber]; //重み初期化
             Random random = new Random();
             for (int SetWeigthCount_X = 0; SetWeigthCount_X < NeuronNumber; SetWeigthCount_X++)
-                for (int SetWeigthCount_Y = 0; SetWeigthCount_Y < NeuronNumber; SetWeigthCount_Y++)
-                    Weigth[SetWeigthCount_X, SetWeigthCount_Y] = (double)random.Next(-30, 30) / 30d;
+                for (int SetWeigthCount_Y = 0; SetWeigthCount_Y < NeuronNumber; SetWeigthCount_Y++) {
+                    Weigth[SetWeigthCount_X, SetWeigthCount_Y] = (double)random.Next(0, 30) / 30d;
+                    //Console.WriteLine(Weigth[SetWeigthCount_X, SetWeigthCount_Y]);
+                }
 
             Updated_Weigth = new double[NeuronNumber, NeuronNumber];
             for (int SetWeigthCount_X = 0; SetWeigthCount_X < NeuronNumber; SetWeigthCount_X++)
@@ -81,13 +83,14 @@ namespace My_Neural_Network
         }
 
         public void Update_Weigth() {
-            Weigth = (double[,])Updated_Weigth;
+            Weigth = (double[,])Updated_Weigth.Clone();
         }
 
         public double Getsumof_Delta_Weigth(int Intercession) {
             double Result = 0;
-            for(int GetSumCount = 0;GetSumCount < NeuronNumber; GetSumCount++)
+            for (int GetSumCount = 0; GetSumCount < NeuronNumber; GetSumCount++) {
                 Result += Delta[GetSumCount] * Weigth[GetSumCount, Intercession];
+            }
             return Result;
         }
     }

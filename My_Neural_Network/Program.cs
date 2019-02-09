@@ -28,7 +28,7 @@ namespace My_Neural_Network
             }
 
             double[] InputData = { 0, 0, 0 }; //ネットワークに入力するデータ
-            for(int TrainNumber = 0;TrainNumber < 10000; TrainNumber++) { //学習回数
+            for(int TrainNumber = 0;TrainNumber < 1000; TrainNumber++) { //学習回数
                 for(InputData[0] = 0;InputData[0] <= 1; InputData[0]++) { 
                     for(InputData[1] = 0;InputData[1] <= 1; InputData[1]++) {
                         //それぞれのケースで学習させるため
@@ -45,9 +45,22 @@ namespace My_Neural_Network
                         }
 
                         double[] Answer = trainData.GetAnswer(InputData);
+                        /*
+                        foreach (double x in InputData)
+                            Console.Write(x + ":");
+                        Console.Write("||");
+                        foreach (double x in Answer)
+                            Console.Write(x + ":");
+                        Console.WriteLine();
+                        */
 
                         //最後のレイヤーを学習させる。
                         double[] LastLayerOutput = Tissue[Depth - 1].GetData(); //最後の出力を取得
+                        /*
+                        foreach (double x in LastLayerOutput)
+                            Console.Write(x + ":");
+                        Console.WriteLine();
+                        */
                         for (int OwnCount = 0; OwnCount < NeuronNumber; OwnCount++) {
                             double Differentiated_Value = (LastLayerOutput[OwnCount] - Answer[OwnCount]) * LastLayerOutput[OwnCount] * (1 - LastLayerOutput[OwnCount]); //最後の部分を除いて共通の部分の微分値を計算
                             //(g(u[j][l]) - t[j]) * g(u[j][l]) * (1 - g(u[j][l])
@@ -66,26 +79,46 @@ namespace My_Neural_Network
 
                                 for (int TrainNeuronIntercessionCount = 0; TrainNeuronIntercessionCount < NeuronNumber; TrainNeuronIntercessionCount++) {
                                     Tissue[TrainLayerCount].Updated_Weigth[TrainNeuronOwnCount, TrainNeuronIntercessionCount]
-                                        = Tissue[TrainLayerCount].Delta[TrainNeuronOwnCount] * Tissue[TrainLayerCount].Input[TrainNeuronIntercessionCount];
+                                        = Tissue[TrainLayerCount].Weigth[TrainNeuronOwnCount,TrainNeuronIntercessionCount]
+                                        - Epsilon * Tissue[TrainLayerCount].Delta[TrainNeuronOwnCount] * Tissue[TrainLayerCount].Input[TrainNeuronIntercessionCount];
                                 }
                             }
                         }
 
-                        for (int UpdateWeigthCount = 0; UpdateWeigthCount < Depth; UpdateWeigthCount++)
+                        for (int UpdateWeigthCount = 0; UpdateWeigthCount < Depth; UpdateWeigthCount++) //重み更新
                             Tissue[UpdateWeigthCount].Update_Weigth();
 
-                        foreach(double delta in Tissue[Depth - 1].Delta) {
-                            Console.Write(delta.ToString());
+                        /*
+                        for (int tc = 0; tc < Depth; tc++) {
+                            Console.WriteLine("Layer:" + tc);
+                            for (int oc = 0; oc < NeuronNumber; oc++) {
+                                for (int ic = 0; ic < NeuronNumber; ic++)
+                                    Console.Write(oc + " to " + ic + " : " + Tissue[tc].Weigth[oc, ic] + ",");
+                            }
                         }
-                        Console.WriteLine();
+                        Console.WriteLine("@@@\n");
+                        */
                     }
                 }
             }
 
+            int d = 0;
+            double[] tmp = trainData.InputData[d];
+            double[] Answerdata = trainData.GetAnswer(tmp);
+
+            for(int i = 0;i < Depth; i++) {
+                Tissue[i].SetData(tmp);
+                tmp = Tissue[i].GetData();
+            }
+
+            Tissue[Depth - 1].GetDelta_in_lastLayer(Answerdata);
+            tmp = Tissue[Depth - 1].Delta;
+            foreach (double da in tmp)
+                Console.Write(da + ":");
 
 
+            Console.WriteLine("Finished");
+            Console.ReadLine();
         }
     }
-
-
 }
