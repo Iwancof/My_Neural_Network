@@ -58,10 +58,32 @@ namespace My_Neural_Network
                         }
 
                         //中間層の学習
-                        Tissue[Depth - 1].GetDelta_in_lastLayer(Answer);
+                        Tissue[Depth - 1].GetDelta_in_lastLayer(Answer); //最後のレイヤーのδを取得
+                        for (int TrainLayerCount = Depth - 2;/*最後にひとつ前*/TrainLayerCount >= 0; TrainLayerCount--) { //逆誤差伝播法
+                            double[] TrainTmpOutput = Tissue[TrainLayerCount].GetData(); //そのレイヤーのアウトプット、つまりg(u)を取得
+                            for (int TrainNeuronOwnCount = 0; TrainNeuronOwnCount < NeuronNumber; TrainNeuronOwnCount++) { //各ニューロンに対して
+                                Tissue[TrainLayerCount].Delta[TrainNeuronOwnCount] = Tissue[TrainLayerCount + 1].Getsumof_Delta_Weigth(TrainNeuronOwnCount) * TrainTmpOutput[TrainNeuronOwnCount] * (1 - TrainTmpOutput[TrainNeuronOwnCount]);
+
+                                for (int TrainNeuronIntercessionCount = 0; TrainNeuronIntercessionCount < NeuronNumber; TrainNeuronIntercessionCount++) {
+                                    Tissue[TrainLayerCount].Updated_Weigth[TrainNeuronOwnCount, TrainNeuronIntercessionCount]
+                                        = Tissue[TrainLayerCount].Delta[TrainNeuronOwnCount] * Tissue[TrainLayerCount].Input[TrainNeuronIntercessionCount];
+                                }
+                            }
+                        }
+
+                        for (int UpdateWeigthCount = 0; UpdateWeigthCount < Depth; UpdateWeigthCount++)
+                            Tissue[UpdateWeigthCount].Update_Weigth();
+
+                        foreach(double delta in Tissue[Depth - 1].Delta) {
+                            Console.Write(delta.ToString());
+                        }
+                        Console.WriteLine();
                     }
                 }
             }
+
+
+
         }
     }
 

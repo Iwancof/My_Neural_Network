@@ -10,7 +10,7 @@ namespace My_Neural_Network
         public double[,] Weigth; //重み。受け取る時、つまり入力時にかけられる。 [自身,相手] 
         public double[,] Updated_Weigth; //アップデートされた重み。終わったときにWeigthに上書き
         double[] Bias; //バイアス。入力時
-        double[] Delta; //δ
+        public double[] Delta; //δ
 
         public double[] Input; //そのままの入力。つまり前回の出力
         double[] Output; //出力
