@@ -7,11 +7,12 @@ namespace My_Neural_Network
     public class LayerClass
     {
         int NeuronNumber; //ニューロンの数
-        double[,] Weigth; //重み。受け取る時、つまり入力時にかけられる。 [自身,相手] 
+        public double[,] Weigth; //重み。受け取る時、つまり入力時にかけられる。 [自身,相手] 
+        public double[,] Updated_Weigth; //アップデートされた重み。終わったときにWeigthに上書き
         double[] Bias; //バイアス。入力時
         double[] Delta; //δ
 
-        double[] Input; //そのままの入力。つまり前回の出力
+        public double[] Input; //そのままの入力。つまり前回の出力
         double[] Output; //出力
         public bool IsCalced = false; //出力が計算されているか。高速化のため。
 
@@ -24,7 +25,13 @@ namespace My_Neural_Network
                 for (int SetWeigthCount_Y = 0; SetWeigthCount_Y < NeuronNumber; SetWeigthCount_Y++)
                     Weigth[SetWeigthCount_X, SetWeigthCount_Y] = (double)random.Next(-30, 30) / 30d;
 
-            Bias = new double[NeuronNumber]; //バイアス初期化
+            Updated_Weigth = new double[NeuronNumber, NeuronNumber];
+            for (int SetWeigthCount_X = 0; SetWeigthCount_X < NeuronNumber; SetWeigthCount_X++)
+                for (int SetWeigthCount_Y = 0; SetWeigthCount_Y < NeuronNumber; SetWeigthCount_Y++)
+                    Updated_Weigth[SetWeigthCount_X, SetWeigthCount_Y] = 0; //0で初期化
+
+
+                    Bias = new double[NeuronNumber]; //バイアス初期化
             for (int SetBiasCount = 0; SetBiasCount < NeuronNumber; SetBiasCount++)
                 Bias[SetBiasCount] = 0; //とりあえず0で初期化
 
@@ -59,12 +66,29 @@ namespace My_Neural_Network
                 //Weigthed_Input[OwnCount] = Sum; //重み付けされた入力
                 Output[OwnCount] = ActFunc(Sum);
             }
+            IsCalced = true;
         }
 
-        public double ActFunc(double x) {
+        public double ActFunc(double x) { //活性化関数
             //シグモイド
             return 1d / (1 + Math.Pow(Math.E, -x));
         }
 
+        public void GetDelta_in_lastLayer(double[] Answer) {
+            if (!IsCalced) throw new Exception("計算されていないため誤差を取得できません。");
+            for (int GetDeltaCount = 0; GetDeltaCount < NeuronNumber; GetDeltaCount++)
+                Delta[GetDeltaCount] = Math.Abs(Output[GetDeltaCount] - Answer[GetDeltaCount]);
+        }
+
+        public void Update_Weigth() {
+            Weigth = (double[,])Updated_Weigth;
+        }
+
+        public double Getsumof_Delta_Weigth(int Intercession) {
+            double Result = 0;
+            for(int GetSumCount = 0;GetSumCount < NeuronNumber; GetSumCount++)
+                Result += Delta[GetSumCount] * Weigth[GetSumCount, Intercession];
+            return Result;
+        }
     }
 }
