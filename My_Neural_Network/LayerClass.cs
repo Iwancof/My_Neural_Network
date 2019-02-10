@@ -23,7 +23,8 @@ namespace My_Neural_Network
             Random random = new Random();
             for (int SetWeigthCount_X = 0; SetWeigthCount_X < NeuronNumber; SetWeigthCount_X++)
                 for (int SetWeigthCount_Y = 0; SetWeigthCount_Y < NeuronNumber; SetWeigthCount_Y++) {
-                    Weigth[SetWeigthCount_X, SetWeigthCount_Y] = (double)random.Next(0, 30) / 30d;
+                    //Weigth[SetWeigthCount_X, SetWeigthCount_Y] = (double)random.Next(0, 30) / 30d;
+                    Weigth[SetWeigthCount_X, SetWeigthCount_Y] = 0;
                     //Console.WriteLine(Weigth[SetWeigthCount_X, SetWeigthCount_Y]);
                 }
 
@@ -35,7 +36,7 @@ namespace My_Neural_Network
 
                     Bias = new double[NeuronNumber]; //バイアス初期化
             for (int SetBiasCount = 0; SetBiasCount < NeuronNumber; SetBiasCount++)
-                Bias[SetBiasCount] = 0; //とりあえず0で初期化
+                Bias[SetBiasCount] = 0.0; //とりあえず0で初期化
 
             Delta = new double[NeuronNumber]; //デルタ初期化
             for (int SetDeltaCount = 0; SetDeltaCount < NeuronNumber; SetDeltaCount++)
@@ -47,11 +48,11 @@ namespace My_Neural_Network
         }
 
         public void SetData(double[] InputData) { //データ入力
-            this.Input = (double[])InputData.Clone(); //入力をコピー
+            Input = (double[])InputData.Clone(); //入力をコピー
         }
         
         public double[] GetData() { //出力
-            if (!IsCalced) //処理されていないのであれば
+//            if (!IsCalced) //処理されていないのであれば
                 CalcOut();
             return Output;
         }
@@ -60,10 +61,10 @@ namespace My_Neural_Network
             //入力に重みをかけ、バイアスとの和を求め、活性化関数に通す。
             //double[] Weigthed_Input = new double[NeuronNumber];
             double Sum = 0;
-            int OwnCount, IntercessionCount; //高速化のため。
-            for (OwnCount = 0; OwnCount < NeuronNumber; OwnCount++) {
+            //int OwnCount, IntercessionCount; //高速化のため。
+            for (int OwnCount = 0; OwnCount < NeuronNumber; OwnCount++) {
                 Sum = 0; //合計の初期化
-                for (IntercessionCount = 0; IntercessionCount < NeuronNumber; IntercessionCount++)
+                for (int IntercessionCount = 0; IntercessionCount < NeuronNumber; IntercessionCount++)
                     Sum += Input[OwnCount] * Weigth[OwnCount, IntercessionCount] + Bias[OwnCount]; //合計を求める。
                 //Weigthed_Input[OwnCount] = Sum; //重み付けされた入力
                 Output[OwnCount] = ActFunc(Sum);
@@ -73,13 +74,14 @@ namespace My_Neural_Network
 
         public double ActFunc(double x) { //活性化関数
             //シグモイド
-            return 1d / (1 + Math.Pow(Math.E, -x));
+            return 1d / (1 + Math.Exp(-x));
         }
 
         public void GetDelta_in_lastLayer(double[] Answer) {
             if (!IsCalced) throw new Exception("計算されていないため誤差を取得できません。");
             for (int GetDeltaCount = 0; GetDeltaCount < NeuronNumber; GetDeltaCount++)
                 Delta[GetDeltaCount] = Math.Abs(Output[GetDeltaCount] - Answer[GetDeltaCount]);
+                //Delta[GetDeltaCount] = Math.Pow(Output[GetDeltaCount] - Answer[GetDeltaCount],2) / 2;
         }
 
         public void Update_Weigth() {

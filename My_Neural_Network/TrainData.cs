@@ -28,10 +28,10 @@ namespace My_Neural_Network
             for(ResultCount = 0;ResultCount < Number_Of_Data; ResultCount++) {
                 if (InputData[ResultCount].SequenceEqual(Data))
                     break;
-                if (ResultCount == Number_Of_Data)
+                if (ResultCount == Number_Of_Data - 1)
                     throw new Exception("教師データが見つかりません。");
             }
-
+            //Console.WriteLine(ResultCount);
             return AnswerData[ResultCount];
         }
     }
